@@ -330,7 +330,6 @@ void LadspaHost::jack_cleanup() {
         if (ladspa_plug.PluginHandle) dlclose(ladspa_plug.PluginHandle);
         jack_client_close(jack_client);
         jack_client = NULL;
-        delete m_window;
         delete [] ladspa_plug.cpv;
         delete [] ports;
     }
@@ -417,6 +416,7 @@ bool LadspaHost::cmd_parser(int argc, char **argv,
 
 bool LadspaHost::on_delete_event(GdkEventAny*) {
     jack_cleanup();
+    delete m_window;
     delete this;
     if(Counter::get_instance()->getCount() <=0) {
         if(Gtk::Main::instance()->level()) Gtk::Main::quit();
