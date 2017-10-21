@@ -28,7 +28,7 @@
 
 /*****************************************************************************/
 
-namespace sila {
+namespace sila_host {
 
 int LadspaHost::compute_callback(jack_nframes_t nframes, void *arg) {
     LadspaHost& self = *static_cast<LadspaHost*>(arg);
@@ -66,11 +66,13 @@ int LadspaHost::buffer_size_callback(jack_nframes_t nframes, void *arg) {
 
 void LadspaHost::shut_down_callback(void *arg) {
     LadspaHost* self = static_cast<LadspaHost*>(arg);
+    if (self->jack_client) self->jack_client = 0;
     fprintf(stderr,"Exit: JACK shut us down\n");
+    if (self->ladspa_plug.PluginHandle) dlclose(self->ladspa_plug.PluginHandle);
     delete [] self->ladspa_plug.cpv;
     delete [] self->ports;
     delete self;
-    if(Counter::get_instance()->getCount() <=0) {
+    if(sila::Counter::get_instance()->getCount() <=0) {
         if(Gtk::Main::instance()->level()) Gtk::Main::quit();
         exit(1);
     }
@@ -91,7 +93,7 @@ void LadspaHost::activate_jack() {
         delete [] ports;
         fprintf(stderr,"Exit: could not activate JACK processing\n");
         delete this;
-        if(Counter::get_instance()->getCount() <=0) { 
+        if(sila::Counter::get_instance()->getCount() <=0) { 
             if(Gtk::Main::instance()->level()) Gtk::Main::quit();
             exit(1);
         }
@@ -111,17 +113,17 @@ void LadspaHost::activate_jack() {
                 portname = ladspa_plug.descriptor->Name;
                 portname += "_SHINPUT";
                 c++;
-                portname += to_string(a);
+                portname += sila::to_string(a);
                 portname += "_";
-                portname += to_string(c);
+                portname += sila::to_string(c);
                 while(getenv(portname.c_str()) != NULL){
                     jack_connect(jack_client, getenv(portname.c_str()), jack_port_name(ports[i]));
                     portname = ladspa_plug.descriptor->Name;
                     portname += "_SHINPUT";
                     c++;
-                    portname += to_string(a);
+                    portname += sila::to_string(a);
                     portname += "_";
-                    portname += to_string(c);
+                    portname += sila::to_string(c);
                 }
                 c--;
                 a++;
@@ -129,17 +131,17 @@ void LadspaHost::activate_jack() {
                 portname = ladspa_plug.descriptor->Name;
                 portname += "_SHOUTPUT";
                 d++;
-                portname += to_string(b);
+                portname += sila::to_string(b);
                 portname += "_";
-                portname += to_string(d);
+                portname += sila::to_string(d);
                 while (getenv(portname.c_str()) != NULL) {
                     jack_connect(jack_client, jack_port_name(ports[i]), getenv(portname.c_str()));
                     portname = ladspa_plug.descriptor->Name;
                     portname += "_SHOUTPUT";
                     d++;
-                    portname += to_string(b);
+                    portname += sila::to_string(b);
                     portname += "_";
-                    portname += to_string(d);
+                    portname += sila::to_string(d);
                 }
                 d--;
                 b++;
@@ -273,9 +275,9 @@ void LadspaHost::get_connections() {
                     portname = ladspa_plug.descriptor->Name;
                     portname += "_SHINPUT";
                     c++;
-                    portname += to_string(a);
+                    portname += sila::to_string(a);
                     portname += "_";
-                    portname += to_string(c);
+                    portname += sila::to_string(c);
                     setenv(portname.c_str(),port[j],1);
                 }
             }
@@ -287,9 +289,9 @@ void LadspaHost::get_connections() {
                     portname = ladspa_plug.descriptor->Name;
                     portname += "_SHOUTPUT";
                     d++;
-                    portname += to_string(b);
+                    portname += sila::to_string(b);
                     portname += "_";
-                    portname += to_string(d);
+                    portname += sila::to_string(d);
                     setenv(portname.c_str(),port[j],1);
                 }
             }
@@ -358,7 +360,7 @@ bool LadspaHost::load_ladspa_plugin(Glib::ustring PluginFilename,
         PluginFilename = const_cast<char*>(path.c_str());
     }
     
-    ladspa_plug.PluginHandle = dlopen(PluginFilename.c_str(), RTLD_NOW | RTLD_LOCAL);
+    ladspa_plug.PluginHandle = dlopen(PluginFilename.c_str(), RTLD_LOCAL|RTLD_NOW );
     if (!ladspa_plug.PluginHandle) {
         *message = dlerror();
         jack_cleanup();
@@ -415,7 +417,7 @@ bool LadspaHost::cmd_parser(int argc, char **argv,
 bool LadspaHost::on_delete_event(GdkEventAny*) {
     jack_cleanup();
     delete this;
-    if(Counter::get_instance()->getCount() <=0) {
+    if(sila::Counter::get_instance()->getCount() <=0) {
         if(Gtk::Main::instance()->level()) Gtk::Main::quit();
     }
     return false;
@@ -454,12 +456,12 @@ void LadspaHost::sila_start(int argc, char **argv) {
         m_window->show();
     } else {
         delete this;
-        if(Counter::get_instance()->getCount() <=0) {
+        if(sila::Counter::get_instance()->getCount() <=0) {
             if(Gtk::Main::instance()->level()) Gtk::Main::quit();
             exit(1);
         }
     }
 }
 
-} //end namespace sila
+} //end namespace sila_host
 /*****************************************************************************/

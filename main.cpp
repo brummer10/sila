@@ -33,12 +33,12 @@ int main(int argc, char **argv) {
     Gtk::Main main(argc, argv);
 
     if  (argc < 2) {
-        sila::LadspaBrowser *ladspa_browser;
-        ladspa_browser = new sila::LadspaBrowser();
+        sila_browser::LadspaBrowser *ladspa_browser;
+        ladspa_browser = new sila_browser::LadspaBrowser();
         ladspa_browser->show_browser();
     } else {
-        sila::LadspaHost *ladspa_host;
-        ladspa_host = new sila::LadspaHost();
+        sila_host::LadspaHost *ladspa_host;
+        ladspa_host = new sila_host::LadspaHost();
         ladspa_host->sila_start(argc, argv);
     }
     

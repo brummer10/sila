@@ -27,8 +27,8 @@
 #include "sila.h"
 
 /*****************************************************************************/
-namespace sila {
 
+namespace sila_browser {
 
 /*  this routine will search the LADSPA_PATH for the file. */
 void *LadspaBrowser::dlopenLADSPA(const char * pcFilename, int iFlag) {
@@ -79,7 +79,7 @@ void *LadspaBrowser::loadLADSPAPluginLibrary(const char * pcPluginFilename) {
 
     void * pvPluginHandle;
 
-    pvPluginHandle = dlopenLADSPA(pcPluginFilename, RTLD_NOW);
+    pvPluginHandle = dlopenLADSPA(pcPluginFilename, RTLD_LOCAL|RTLD_NOW);
     if (!pvPluginHandle) {
         fprintf(stderr, 
             "Failed to load plugin \"%s\": %s\n", 
@@ -176,7 +176,7 @@ Glib::ustring LadspaBrowser::analysePlugin(const char * pcPluginFilename,
             collect_details +="\n Plugin Label: ";
             collect_details += psDescriptor->Label;
             collect_details +="\n Plugin Unique ";
-            collect_details +=to_string(psDescriptor->UniqueID);
+            collect_details +=sila::to_string(psDescriptor->UniqueID);
             collect_details +="\n Plugin Name: ";
             collect_details +=psDescriptor->Name;
             
@@ -188,26 +188,26 @@ Glib::ustring LadspaBrowser::analysePlugin(const char * pcPluginFilename,
             collect_details +="\n Plugin Label: ";
             collect_details += psDescriptor->Label;
             collect_details += "\n Plugin Unique ";
-            collect_details +=to_string(psDescriptor->UniqueID);
+            collect_details +=sila::to_string(psDescriptor->UniqueID);
             collect_details +="\n Maker: ";
             collect_details +=psDescriptor->Maker;
             collect_details +="\n";
             collect_details +=" RT: ";
-            collect_details +=to_string(psDescriptor->Properties);
+            collect_details +=sila::to_string(psDescriptor->Properties);
             collect_details +="\n";
             collect_details +=" Ports: ";
             
             
             if (psDescriptor->PortCount == 0)
                 collect_details +="\tERROR: PLUGIN HAS NO PORTS.\n";
-            else collect_details += to_string(psDescriptor->PortCount);
+            else collect_details += sila::to_string(psDescriptor->PortCount);
                 collect_details +="\n";
       
             for (lPortIndex = 0; 
                 lPortIndex < psDescriptor->PortCount; 
                 lPortIndex++) {
                     collect_details +=" index ";
-                    collect_details +=to_string(lPortIndex);
+                    collect_details +=sila::to_string(lPortIndex);
                     collect_details += ": ";
                     collect_details += " ";
                     collect_details += psDescriptor->PortNames[lPortIndex];
@@ -264,21 +264,21 @@ Glib::ustring LadspaBrowser::analysePlugin(const char * pcPluginFilename,
                 if (LADSPA_IS_HINT_BOUNDED_BELOW(iHintDescriptor)) {
                     fBound = psDescriptor->PortRangeHints[lPortIndex].LowerBound;
                     if (LADSPA_IS_HINT_SAMPLE_RATE(iHintDescriptor) && fBound != 0) {
-                        collect_details += to_string(fBound);
+                        collect_details += sila::to_string(fBound);
                         collect_details +="*srate";
                     } else {
                         collect_details +=" Range: ";
-                        collect_details += to_string(fBound);
+                        collect_details += sila::to_string(fBound);
                     }
                 } else collect_details +="...";
                 collect_details +=" to ";
                 if (LADSPA_IS_HINT_BOUNDED_ABOVE(iHintDescriptor)) {
                     fBound = psDescriptor->PortRangeHints[lPortIndex].UpperBound;
                     if (LADSPA_IS_HINT_SAMPLE_RATE(iHintDescriptor) && fBound != 0) {
-                        collect_details += to_string(fBound);
+                        collect_details += sila::to_string(fBound);
                         collect_details +="*srate";
                     } else {
-                        collect_details += to_string(fBound);
+                        collect_details += sila::to_string(fBound);
                     }
                 } else collect_details +="...";
             }
@@ -301,11 +301,11 @@ Glib::ustring LadspaBrowser::analysePlugin(const char * pcPluginFilename,
                     fDefault = psDescriptor->PortRangeHints[lPortIndex].LowerBound;
                     if (LADSPA_IS_HINT_SAMPLE_RATE(iHintDescriptor) && fDefault != 0) {
                         collect_details += ", default ";
-                        collect_details += to_string(fDefault);
+                        collect_details += sila::to_string(fDefault);
                         collect_details += "*srate";
                     } else {
                         collect_details += ", default ";
-                        collect_details += to_string(fDefault);
+                        collect_details += sila::to_string(fDefault);
                     }
                     break;
                 case LADSPA_HINT_DEFAULT_LOW:
@@ -322,11 +322,11 @@ Glib::ustring LadspaBrowser::analysePlugin(const char * pcPluginFilename,
                     }
                     if (LADSPA_IS_HINT_SAMPLE_RATE(iHintDescriptor) && fDefault != 0) {
                         collect_details += ", default ";
-                        collect_details += to_string(fDefault);
+                        collect_details += sila::to_string(fDefault);
                         collect_details += "*srate";
                     } else {
                         collect_details += ", default ";
-                        collect_details += to_string(fDefault);
+                        collect_details += sila::to_string(fDefault);
                     }
                     break;
                 case LADSPA_HINT_DEFAULT_MIDDLE:
@@ -339,11 +339,11 @@ Glib::ustring LadspaBrowser::analysePlugin(const char * pcPluginFilename,
                     }
                     if (LADSPA_IS_HINT_SAMPLE_RATE(iHintDescriptor) && fDefault != 0)  {
                         collect_details += ", default ";
-                        collect_details += to_string(fDefault);
+                        collect_details += sila::to_string(fDefault);
                         collect_details += "*srate";
                     } else{
                         collect_details += ", default ";
-                        collect_details += to_string(fDefault);
+                        collect_details += sila::to_string(fDefault);
                     }
                     break;
                 case LADSPA_HINT_DEFAULT_HIGH:
@@ -360,22 +360,22 @@ Glib::ustring LadspaBrowser::analysePlugin(const char * pcPluginFilename,
                     }
                     if (LADSPA_IS_HINT_SAMPLE_RATE(iHintDescriptor) && fDefault != 0)  {
                         collect_details += ", default ";
-                        collect_details += to_string(fDefault);
+                        collect_details += sila::to_string(fDefault);
                         collect_details += "*srate";
                     }else {
                         collect_details += ", default ";
-                        collect_details += to_string(fDefault);
+                        collect_details += sila::to_string(fDefault);
                     }
                     break;
                 case LADSPA_HINT_DEFAULT_MAXIMUM:
                     fDefault = psDescriptor->PortRangeHints[lPortIndex].UpperBound;
                     if (LADSPA_IS_HINT_SAMPLE_RATE(iHintDescriptor) && fDefault != 0)  {
                         collect_details += ", default ";
-                        collect_details += to_string(fDefault);
+                        collect_details += sila::to_string(fDefault);
                         collect_details += "*srate";
                     } else {
                         collect_details += ", default ";
-                        collect_details += to_string(fDefault);
+                        collect_details += sila::to_string(fDefault);
                     }
                     break;
                 case LADSPA_HINT_DEFAULT_0:
@@ -458,7 +458,7 @@ void LadspaBrowser::make_menu(const LADSPA_Descriptor * psDescriptor, Glib::ustr
         mono_plug += "] ";
         mono_plug += psDescriptor->Label;
         mono_plug += " ";
-        mono_plug += to_string(psDescriptor->UniqueID);
+        mono_plug += sila::to_string(psDescriptor->UniqueID);
         plug_mono_list.push_back(mono_plug);
     } else if(inputports == 2 && outputports == 2) {
         std::string stereo_plug = "[";
@@ -466,7 +466,7 @@ void LadspaBrowser::make_menu(const LADSPA_Descriptor * psDescriptor, Glib::ustr
         stereo_plug += "] ";
         stereo_plug += psDescriptor->Label;
         stereo_plug += " ";
-        stereo_plug += to_string(psDescriptor->UniqueID);
+        stereo_plug += sila::to_string(psDescriptor->UniqueID);
         plug_stereo_list.push_back(stereo_plug);
     } else {
         std::string misc_plug = "[";
@@ -474,7 +474,7 @@ void LadspaBrowser::make_menu(const LADSPA_Descriptor * psDescriptor, Glib::ustr
         misc_plug += "] ";
         misc_plug += psDescriptor->Label;
         misc_plug += " ";
-        misc_plug += to_string(psDescriptor->UniqueID);
+        misc_plug += sila::to_string(psDescriptor->UniqueID);
         plug_misc_list.push_back(misc_plug);
     }
 }
@@ -543,7 +543,7 @@ void LadspaBrowser::create_list() {
                         break;
                     //dat = psDescriptor->Label;
                     Gtk::TreeModel::Row childrow = *(model->append(row.children()));
-                    childrow[columns.name] = to_string(psDescriptor->UniqueID);
+                    childrow[columns.name] = sila::to_string(psDescriptor->UniqueID);
                     
                     childrow[columns.label] = psDescriptor->Label;
                     make_menu(psDescriptor, str);
@@ -581,7 +581,7 @@ LadspaBrowser::LadspaBrowser()
     apply_button(Gtk::Stock::EXECUTE),
     quit_button(Gtk::Stock::QUIT),
     scrollWindow() {
-    ++Counter::get_instance()->getCount();
+    ++sila::Counter::get_instance()->getCount();
     set_default_size(450,450);
     set_title("Little Ladspa Host");
     set_decorated(true);
@@ -719,7 +719,7 @@ void LadspaBrowser::on_execute() {
         }
     }
     // create new instance of LadspaHost and run the given plugin
-    LadspaHost *ladspa_host = new LadspaHost();
+    sila_host::LadspaHost *ladspa_host = new sila_host::LadspaHost();
     argv[0] = NULL;
     argv[1] = const_cast<char*>(plhandle.libname.c_str());
     argv[2] = const_cast<char*>(plhandle.UnicID.c_str());
@@ -732,7 +732,7 @@ void LadspaBrowser::on_execute() {
 
 void LadspaBrowser::on_quit() {
     delete this;
-    if (Counter::get_instance()->getCount() <=0) {
+    if (sila::Counter::get_instance()->getCount() <=0) {
         if(Gtk::Main::instance()->level()) Gtk::Main::quit();
     }
 }
@@ -747,15 +747,15 @@ void LadspaBrowser::show_browser() {
 
 void LadspaBrowser::get_file_handle(Glib::ustring *plfile, int *plid) {
     *plfile = plhandle.libname;
-    *plid = atoi(to_string(plhandle.UnicID).c_str());
+    *plid = atoi(sila::to_string(plhandle.UnicID).c_str());
 }
 
 /*****************************************************************************/
 
 LadspaBrowser::~LadspaBrowser() {
-    --Counter::get_instance()->getCount();
+    --sila::Counter::get_instance()->getCount();
 }
 
-} //end namespace sila
+} //end namespace sila_browser
 /*****************************************************************************/
 

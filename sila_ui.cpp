@@ -27,7 +27,7 @@
 #include "sila.h"
 
 /**********************************************************************/
-namespace sila {
+namespace sila_host {
 
 static void set_default_value(LADSPA_PortRangeHintDescriptor hdescriptor,
                         float lower_bound, float upper_bound, float *dest) {
@@ -296,5 +296,5 @@ Gtk::Window *LadspaHost::create_widgets() {
     return((Gtk::Window*)main_box);
 }
 
-} //end namespace sila
+} //end namespace sila_host
 /*****************************************************************************/

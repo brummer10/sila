@@ -63,6 +63,18 @@ public:
     };
 };
 
+
+template <class T>
+inline std::string to_string(const T& t) {
+    std::stringstream ss;
+    ss << t;
+    return ss.str();
+}
+
+} // end namespace sila
+
+namespace sila_browser {
+
 class LadspaBrowser : public Gtk::Window {
 private:
 
@@ -123,14 +135,11 @@ public:
     ~LadspaBrowser();
 }; 
 
+} // end namespace sila_browser
+
 /*****************************************************************************/
 
-template <class T>
-inline std::string to_string(const T& t) {
-    std::stringstream ss;
-    ss << t;
-    return ss.str();
-}
+namespace sila_host {
 
 class LadspaHost {
  private:
@@ -173,16 +182,16 @@ class LadspaHost {
     int get_samplerate() {return SR;}
     void sila_start(int argc, char **argv);
     LadspaHost() { 
-        ++Counter::get_instance()->getCount();
+        ++sila::Counter::get_instance()->getCount();
         m_window = new Gtk::Window;
     }
     ~LadspaHost() { 
-        --Counter::get_instance()->getCount();
+        --sila::Counter::get_instance()->getCount();
         delete m_window;
     }
 };
 
-} //end namespace sila
+} //end namespace sila_host
 /*****************************************************************************/
 
 #endif // _SILA_H
