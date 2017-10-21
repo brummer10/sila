@@ -155,10 +155,14 @@ class LadspaHost {
     int SR;
     int BZ;
     jack_client_t *jack_client;
+    Gtk::Window *m_window;
     Gtk::Window *create_widgets();
     std::string client_name;
     jack_port_t **ports;
     void get_connections();
+    void jack_cleanup();
+    void activate_jack();
+    void deactivate_jack();
     static int compute_callback(jack_nframes_t nframes, void *arg);
     static int buffer_size_callback(jack_nframes_t nframes, void *arg);
     static gboolean buffer_changed(void* arg);
@@ -166,12 +170,8 @@ class LadspaHost {
 
  public:
     LadspaPlug ladspa_plug;
-    Gtk::Window *m_window;
     int get_samplerate() {return SR;}
     void sila_start(int argc, char **argv);
-    void jack_cleanup();
-    void activate_jack();
-    void deactivate_jack();
     LadspaHost() { 
         ++Counter::get_instance()->getCount();
         m_window = new Gtk::Window;
