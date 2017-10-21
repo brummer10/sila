@@ -69,7 +69,6 @@ void LadspaHost::shut_down_callback(void *arg) {
     fprintf(stderr,"Exit: JACK shut us down\n");
     delete [] self->ladspa_plug.cpv;
     delete [] self->ports;
-    delete self->m_window;
     delete self;
     if(Counter::get_instance()->getCount() <=0) {
         if(Gtk::Main::instance()->level()) Gtk::Main::quit();
