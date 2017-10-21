@@ -91,7 +91,6 @@ void LadspaHost::activate_jack() {
         delete [] ladspa_plug.cpv;
         delete [] ports;
         fprintf(stderr,"Exit: could not activate JACK processing\n");
-        delete m_window;
         delete this;
         if(Counter::get_instance()->getCount() <=0) { 
             if(Gtk::Main::instance()->level()) Gtk::Main::quit();
@@ -416,7 +415,6 @@ bool LadspaHost::cmd_parser(int argc, char **argv,
 
 bool LadspaHost::on_delete_event(GdkEventAny*) {
     jack_cleanup();
-    delete m_window;
     delete this;
     if(Counter::get_instance()->getCount() <=0) {
         if(Gtk::Main::instance()->level()) Gtk::Main::quit();
@@ -446,7 +444,6 @@ bool LadspaHost::sila_try(int argc, char **argv) {
 
 void LadspaHost::sila_start(int argc, char **argv) {
     if (sila_try(argc, argv)) {
-        m_window = new Gtk::Window;
         m_window->signal_delete_event().connect(
             sigc::mem_fun(*this,&LadspaHost::on_delete_event)); 
         m_window->add(*create_widgets());
@@ -457,7 +454,6 @@ void LadspaHost::sila_start(int argc, char **argv) {
         activate_jack();
         m_window->show();
     } else {
-        delete m_window;
         delete this;
         if(Counter::get_instance()->getCount() <=0) {
             if(Gtk::Main::instance()->level()) Gtk::Main::quit();

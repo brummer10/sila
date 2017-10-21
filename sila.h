@@ -165,8 +165,6 @@ class LadspaHost {
     static void shut_down_callback(void *arg);
 
  public:
-    LadspaHost() { ++Counter::get_instance()->getCount(); }
-    ~LadspaHost() { --Counter::get_instance()->getCount(); }
     LadspaPlug ladspa_plug;
     Gtk::Window *m_window;
     int get_samplerate() {return SR;}
@@ -174,6 +172,14 @@ class LadspaHost {
     void jack_cleanup();
     void activate_jack();
     void deactivate_jack();
+    LadspaHost() { 
+        ++Counter::get_instance()->getCount();
+        m_window = new Gtk::Window;
+    }
+    ~LadspaHost() { 
+        --Counter::get_instance()->getCount();
+        delete m_window;
+    }
 };
 
 } //end namespace sila
