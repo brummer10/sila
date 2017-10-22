@@ -139,6 +139,19 @@ public:
 
 /*****************************************************************************/
 
+namespace sila_ui {
+
+class LadspaUI : public Gtk::Window {
+ public:
+    Gtk::Window *create_widgets(void* arg);
+    LadspaUI() {};
+    ~LadspaUI() {};
+};
+
+} //end namespace sila_ui
+
+/*****************************************************************************/
+
 namespace sila_host {
 
 class LadspaHost {
@@ -163,9 +176,8 @@ class LadspaHost {
     bool on_delete_event(GdkEventAny*);
     int SR;
     int BZ;
+    sila_ui::LadspaUI *m_window;
     jack_client_t *jack_client;
-    Gtk::Window *m_window;
-    Gtk::Window *create_widgets();
     std::string client_name;
     jack_port_t **ports;
     void get_connections();
@@ -183,7 +195,7 @@ class LadspaHost {
     void sila_start(int argc, char **argv);
     LadspaHost() { 
         ++sila::Counter::get_instance()->getCount();
-        m_window = new Gtk::Window;
+        m_window = new sila_ui::LadspaUI();
     }
     ~LadspaHost() { 
         --sila::Counter::get_instance()->getCount();

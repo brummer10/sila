@@ -27,7 +27,8 @@
 #include "sila.h"
 
 /**********************************************************************/
-namespace sila_host {
+
+namespace sila_ui {
 
 static void set_default_value(LADSPA_PortRangeHintDescriptor hdescriptor,
                         float lower_bound, float upper_bound, float *dest) {
@@ -82,13 +83,14 @@ static void set_default_value(LADSPA_PortRangeHintDescriptor hdescriptor,
 
 class Slider : public Gtk::HScale {
  public:
-    Slider(int port, LadspaHost& ladspa_host);
+    Slider(int port, void* arg);
  private:
     void on_value_changed();
     float *dest;
 };
 
-Slider::Slider(int port,LadspaHost& ladspa_host)  {
+Slider::Slider(int port, void* arg)  {
+    sila_host::LadspaHost& ladspa_host = *static_cast<sila_host::LadspaHost*>(arg);
     LADSPA_PortRangeHint hint = ladspa_host.ladspa_plug.descriptor->PortRangeHints[port];
     LADSPA_PortRangeHintDescriptor hdescriptor = hint.HintDescriptor;
     float lower_bound = hint.LowerBound;
@@ -148,13 +150,14 @@ void Slider::on_value_changed() {
 
 class TButton : public Gtk::ToggleButton {
  public:
-    TButton(int port, LadspaHost& ladspa_host);
+    TButton(int port, void* arg);
  private:
     void on_toggled();
     float *dest;
 };
 
-TButton::TButton(int port, LadspaHost& ladspa_host) {
+TButton::TButton(int port, void* arg) {
+    sila_host::LadspaHost& ladspa_host = *static_cast<sila_host::LadspaHost*>(arg);
     LADSPA_PortRangeHint hint = ladspa_host.ladspa_plug.descriptor->PortRangeHints[port];
     LADSPA_PortRangeHintDescriptor hdescriptor = hint.HintDescriptor;
     set_label(ladspa_host.ladspa_plug.descriptor->PortNames[port]);
@@ -190,13 +193,14 @@ void TButton::on_toggled() {
 
 class Spiner : public Gtk::SpinButton {
  public:
-    Spiner(int port, LadspaHost& ladspa_host);
+    Spiner(int port, void* arg);
  private:
     void on_value_changed();
     float *dest;
 };
 
-Spiner::Spiner(int port, LadspaHost& ladspa_host) {
+Spiner::Spiner(int port, void* arg) {
+    sila_host::LadspaHost& ladspa_host = *static_cast<sila_host::LadspaHost*>(arg);
     LADSPA_PortRangeHint hint = ladspa_host.ladspa_plug.descriptor->PortRangeHints[port];
     LADSPA_PortRangeHintDescriptor hdescriptor = hint.HintDescriptor;
     float lower_bound = hint.LowerBound;
@@ -244,8 +248,8 @@ void Spiner::on_value_changed() {
 
 /**********************************************************************/
 
-Gtk::Window *LadspaHost::create_widgets() {
-	LadspaHost& ladspa_host = *static_cast<LadspaHost*>(this);
+Gtk::Window *LadspaUI::create_widgets(void* arg) {
+    sila_host::LadspaHost& ladspa_host = *static_cast<sila_host::LadspaHost*>(arg);
     Gtk::VBox *main_box = Gtk::manage(new Gtk::VBox);
     Gtk::VBox *controller_box = Gtk::manage(new Gtk::VBox);
  
@@ -257,7 +261,7 @@ Gtk::Window *LadspaHost::create_widgets() {
             if (LADSPA_IS_HINT_TOGGLED(hdescriptor)) {
                 Gtk::HBox *box = Gtk::manage(new Gtk::HBox);
                 box->set_spacing(10);
-                box->pack_start(*Gtk::manage(new TButton( i,ladspa_host)),
+                box->pack_start(*Gtk::manage(new TButton( i,&ladspa_host)),
                                 Gtk::PACK_SHRINK);
                 box->pack_start(*Gtk::manage(new Gtk::HBox), Gtk::PACK_EXPAND_WIDGET);
                 controller_box->pack_start(*box, Gtk::PACK_SHRINK);
@@ -266,7 +270,7 @@ Gtk::Window *LadspaHost::create_widgets() {
                 box->set_spacing(10);
                 box->pack_start(*Gtk::manage(new Gtk::Label(ladspa_host.ladspa_plug.descriptor->PortNames[i]
                                 )), Gtk::PACK_SHRINK);
-                box->pack_start(*Gtk::manage(new Spiner(i,ladspa_host)),
+                box->pack_start(*Gtk::manage(new Spiner(i,&ladspa_host)),
                                 Gtk::PACK_SHRINK);
                 box->pack_start(*Gtk::manage(new Gtk::HBox), Gtk::PACK_EXPAND_WIDGET);
                 controller_box->pack_start(*box, Gtk::PACK_SHRINK);
@@ -275,7 +279,7 @@ Gtk::Window *LadspaHost::create_widgets() {
                 box->set_spacing(10);
                 controller_box->pack_start(*Gtk::manage(new Gtk::Label(ladspa_host.ladspa_plug.descriptor->PortNames[i]
                                 )), Gtk::PACK_EXPAND_WIDGET);
-                box->pack_start(*Gtk::manage(new Slider(i,ladspa_host)),
+                box->pack_start(*Gtk::manage(new Slider(i,&ladspa_host)),
                                 Gtk::PACK_EXPAND_WIDGET);
                 controller_box->pack_start(*box, Gtk::PACK_SHRINK);
             }
@@ -283,7 +287,7 @@ Gtk::Window *LadspaHost::create_widgets() {
             controller_box->pack_start(*sep, Gtk::PACK_EXPAND_WIDGET);
         }
     }
-    if (ladspa_plug.cnp > 12) {
+    if (ladspa_host.ladspa_plug.cnp > 12) {
         Gtk::ScrolledWindow *scrolled_window = Gtk::manage(new Gtk::ScrolledWindow);
         scrolled_window->set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_ALWAYS);
         scrolled_window->set_shadow_type(Gtk::SHADOW_NONE);
@@ -296,5 +300,5 @@ Gtk::Window *LadspaHost::create_widgets() {
     return((Gtk::Window*)main_box);
 }
 
-} //end namespace sila_host
+} //end namespace sila_ui
 /*****************************************************************************/

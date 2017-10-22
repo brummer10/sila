@@ -66,7 +66,7 @@ int LadspaHost::buffer_size_callback(jack_nframes_t nframes, void *arg) {
 
 void LadspaHost::shut_down_callback(void *arg) {
     LadspaHost* self = static_cast<LadspaHost*>(arg);
-    if (self->jack_client) self->jack_client = 0;
+    self->jack_client = 0;
     fprintf(stderr,"Exit: JACK shut us down\n");
     if (self->ladspa_plug.PluginHandle) dlclose(self->ladspa_plug.PluginHandle);
     delete [] self->ladspa_plug.cpv;
@@ -89,6 +89,7 @@ void LadspaHost::deactivate_jack() {
 
 void LadspaHost::activate_jack() {
     if (jack_activate(jack_client)) {
+        if (ladspa_plug.PluginHandle) dlclose(ladspa_plug.PluginHandle);
         delete [] ladspa_plug.cpv;
         delete [] ports;
         fprintf(stderr,"Exit: could not activate JACK processing\n");
@@ -447,7 +448,7 @@ void LadspaHost::sila_start(int argc, char **argv) {
     if (sila_try(argc, argv)) {
         m_window->signal_delete_event().connect(
             sigc::mem_fun(*this,&LadspaHost::on_delete_event)); 
-        m_window->add(*create_widgets());
+        m_window->add(*m_window->create_widgets(this));
         m_window->resize(500, m_window->get_height());
         m_window->set_title(client_name.c_str());
         m_window->set_position(Gtk::WIN_POS_CENTER);
