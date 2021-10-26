@@ -12,8 +12,8 @@
 	OVERWRITE2 = "	dh_strip --no-automatic-dbgsym"
 	BUILDDEB = dpkg-buildpackage -rfakeroot -uc -us -b 2>/dev/null | grep dpkg-deb 
 
-	CXXFLAGS = -Wall -ffast-math  `pkg-config --cflags gtkmm-2.4`
-	LDFLAGS = `pkg-config --libs gtkmm-2.4 jack` -ldl
+	CXXFLAGS = -Wall -ffast-math  `pkg-config --cflags gtkmm-3.0`
+	LDFLAGS = `pkg-config --libs gtkmm-3.0 jack` -ldl
 
 	OBJECTS = main.o sila_host.o sila_browser.o sila_ui.o
 

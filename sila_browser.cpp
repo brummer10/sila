@@ -25,7 +25,7 @@
 
 
 #include "sila.h"
-
+#include <gtkmm/cssprovider.h>
 /*****************************************************************************/
 
 namespace sila_browser {
@@ -593,15 +593,27 @@ LadspaBrowser::LadspaBrowser()
     treeview.set_model(model);
     treeview.set_name("ladspa_treeview");
     treeview.set_rules_hint(true);
+    treeview.set_grid_lines(Gtk::TREE_VIEW_GRID_LINES_BOTH);
     treeview.append_column("", columns.name);
     treeview.append_column("", columns.label);
-    Gtk::RC::parse_string(
+
+    Glib::ustring data = "treeview { border-color: rgba(125,125,125,0.5);}";
+    auto css = Gtk::CssProvider::create();
+    if(not css->load_from_data(data)) {
+        std::exit(1);
+    }
+    auto screen = Gdk::Screen::get_default();
+    auto ctx = treeview.get_style_context();
+    ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+    // gtkmm-2.4
+   /* Gtk::RC::parse_string(
         "style 'treestyle'{ \n"
            " GtkTreeView::odd-row-color = 'gray94' \n"
            " GtkTreeView::even-row-color = 'gray100' \n"
            " GtkTreeView::allow-rules = 1 \n"
        " } \n"
-       " widget '*ladspa_treeview*' style 'treestyle' \n");
+       " widget '*ladspa_treeview*' style 'treestyle' \n");*/
     scrollWindow.add(treeview);
     scrollWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
     topBox.pack_start(m_pane);
