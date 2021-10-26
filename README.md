@@ -16,7 +16,7 @@ example:
     
 Depends:
 
-- gtkmm-2.4
+- gtkmm3
 - jack
 
 
